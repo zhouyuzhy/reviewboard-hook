@@ -58,15 +58,17 @@ SVNLOOK_PATH = "/usr/bin/"
 # Path contains svn
 SVN_PATH = "/usr/bin/"
 # reviewboard user
-USERNAME = 'xxx'
-PASSWORD = 'xxx'
+USERNAME = ''
+PASSWORD = ''
 # reviewboard server
-SERVER = 'http://ip:port'
+SERVER = ''
 # svn repository address
-REPOSITORY = 'https://svn'
+REPOSITORY = ''
 # read-only svn user
-SVN_USER = 'xxx'
-SVN_PASSWORD = 'xxx'
+SVN_USER = ''
+SVN_PASSWORD = ''
+#SVN_USER = 'pm'
+#SVN_PASSWORD = 'pm_pw'
 # (libsvn / svn / pysvn) python script path
 ENCODING = 'UTF-8'
 
@@ -137,11 +139,12 @@ def main(repos, rev):
     except ValueError:
         sys.stderr.write("Parameter <rev> must be an int, was given %s\n" % rev)
         return
-
+    repo = REPOSITORY+repos.split("/")[-2]+"/"+repos.split("/")[-1]
+    print repo
     # get the svn file system object
     #fs_ptr = svn.repos.svn_repos_fs(svn.repos.svn_repos_open(
     #        svn.core.svn_path_canonicalize(repos)))
-    command = SVN_PATH + "svn log -r " + str(rev) + " -l 1 -v " + REPOSITORY +" --username " + SVN_USER + " --password "+ SVN_PASSWORD + " --non-interactive"
+    command = SVN_PATH + "svn log -r " + str(rev) + " -l 1 -v " + repo +" --username " + SVN_USER + " --password "+ SVN_PASSWORD + " --non-interactive"
     if DEBUG:
         print command
 
@@ -165,7 +168,10 @@ def main(repos, rev):
         return
 
     branchSlashIndex = firstChangePath.find('/',firstChangePath.find('branches')+9,len(firstChangePath)-1)
-    branch = firstChangePath[0:branchSlashIndex]
+    if branchSlashIndex == -1:
+    	branch = firstChangePath
+    else:
+	branch = firstChangePath[0:branchSlashIndex]
     if DEBUG:
         print 'branch=',branch
     print branch,' ',rev
@@ -222,7 +228,7 @@ def main(repos, rev):
     branchlog = ''
     m = re.search(r'(?:branch)(?: )?review', log, re.M | re.I)
     if m:
-        command = SVN_PATH + "svn log --stop-on-copy " + REPOSITORY + branch +" --username " + SVN_USER + " --password "+ SVN_PASSWORD + " --non-interactive"
+        command = SVN_PATH + "svn log --stop-on-copy " + repo + branch +" --username " + SVN_USER + " --password "+ SVN_PASSWORD + " --non-interactive"
         if DEBUG:
             print command
 
@@ -266,9 +272,13 @@ def main(repos, rev):
         description = branchlog
         description = description.replace('------------------------------------------------------------------------', '\n')
     summary = '--summary=' + log[:250].splitlines().pop(0).split('. ').pop(0)
-    description     = "--description=(from [%s] to [%s]) %s" % (prevrev, rev, description[:3000])
+    try:
+        description     = "--description=(from [%s] to [%s]) %s" % (prevrev, rev, description[:3000])
+    except:
+        description = ""
+    print description
     # other parameters for postreview
-    repository_url  = '--repository-url='+REPOSITORY
+    repository_url  = '--repository-url='+repo
     password        = '--password=' + PASSWORD
     username        = '--username=' + USERNAME
     submitas        = '--submit-as=' + author
