@@ -58,15 +58,16 @@ SVNLOOK_PATH = "/usr/bin/"
 # Path contains svn
 SVN_PATH = "/usr/bin/"
 # reviewboard user
-USERNAME = ''
-PASSWORD = ''
+USERNAME = 'repository'
+PASSWORD = 'qxy2ag'
 # reviewboard server
-SERVER = ''
+SERVER = 'http://10.5.111.166'
 # svn repository address
-REPOSITORY = ''
+REPOSITORY = 'https://player.svn.intra.tudou.com/'
+#REPOSITORY = 'svn://10.5.111.166/project'
 # read-only svn user
-SVN_USER = ''
-SVN_PASSWORD = ''
+SVN_USER = 'zhoushaoyu'
+SVN_PASSWORD = '18368017837!z--'
 #SVN_USER = 'pm'
 #SVN_PASSWORD = 'pm_pw'
 # (libsvn / svn / pysvn) python script path
@@ -235,8 +236,11 @@ def main(repos, rev):
         branchlog = execute(command,
                        env = {'LANG': 'en_US.UTF-8'}, shell=True)
         branchloglines = branchlog.splitlines()
+        branchcount = 0
         for branchlogline in reversed(branchloglines):
             if len(branchlogline.split('|')) == 4:
+                branchcount += 1
+            if len(branchlogline.split('|')) == 4 and branchcount == 2:
                 prevrev = int(branchlogline.split(' ')[0][1:])
                 break
 
