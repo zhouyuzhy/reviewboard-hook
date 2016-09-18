@@ -61,13 +61,12 @@ SVN_PATH = "/usr/bin/"
 USERNAME = 'repository'
 PASSWORD = 'qxy2ag'
 # reviewboard server
-SERVER = 'http://10.5.111.166'
+SERVER = 'http://10.0.0.0'
 # svn repository address
-REPOSITORY = 'https://player.svn.intra.tudou.com/'
-#REPOSITORY = 'svn://10.5.111.166/project'
+REPOSITORY = ''
 # read-only svn user
-SVN_USER = 'zhoushaoyu'
-SVN_PASSWORD = '18368017837!z--'
+SVN_USER = ''
+SVN_PASSWORD = ''
 #SVN_USER = 'pm'
 #SVN_PASSWORD = 'pm_pw'
 # (libsvn / svn / pysvn) python script path
@@ -240,7 +239,9 @@ def main(repos, rev):
         for branchlogline in reversed(branchloglines):
             if len(branchlogline.split('|')) == 4:
                 branchcount += 1
-            if len(branchlogline.split('|')) == 4 and branchcount == 2:
+			# sometimes fetch the first commit from branch cannot get the diff,
+			# but most time, need fetch from the first commit
+            if len(branchlogline.split('|')) == 4 and branchcount == 1:
                 prevrev = int(branchlogline.split(' ')[0][1:])
                 break
 
